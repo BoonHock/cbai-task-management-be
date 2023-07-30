@@ -11,16 +11,26 @@ export class TasksService {
     private taskRepository: Repository<Task>,
   ) {}
 
-  async getTasks(sortBy: string): Promise<Task[]> {
+  async getTasks(sortBy: string, search: string, page: number, limit: number) {
     const query = this.taskRepository.createQueryBuilder('task');
     if (sortBy === 'due') {
       query.orderBy('task.dueDate', 'ASC');
     } else {
       query.orderBy('task.createdDate', 'ASC');
     }
-    query.limit(50);
 
-    return query.getMany();
+    if (search) {
+      query.where('task.name LIKE :search', { search: `%${search}%` });
+    }
+
+    query.skip((page - 1) * limit).take(limit);
+
+    const [task, total] = await query.getManyAndCount();
+
+    return {
+      data: task,
+      total: total,
+    };
   }
 
   async getTaskById(taskId: string): Promise<Task> {
@@ -43,7 +53,10 @@ export class TasksService {
     return result.raw[0];
   }
 
-  async updateTask(taskId: string, createTaskDto: CreateTaskDto): Promise<Task> {
+  async updateTask(
+    taskId: string,
+    createTaskDto: CreateTaskDto,
+  ): Promise<Task> {
     const query = this.taskRepository
       .createQueryBuilder()
       .update(Task)

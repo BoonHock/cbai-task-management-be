@@ -9,8 +9,13 @@ export class TasksController {
   constructor(private taskService: TasksService) {}
 
   @Get()
-  async getAllTasks(@Query('sortBy') sortBy: string): Promise<Task[]> {
-    return this.taskService.getTasks(sortBy);
+  async getAllTasks(
+    @Query('sortBy') sortBy: string,
+    @Query('search') search: string,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ) {
+    return this.taskService.getTasks(sortBy, search, page, limit);
   }
 
   @Get('/:id')
