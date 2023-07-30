@@ -12,12 +12,12 @@ export const TypeOrmConfig: TypeOrmModuleAsyncOptions = {
       entities: [Task],
       autoLoadEntities: true,
       synchronize: true,
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'postgres',
-      ssl: false,
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT, 10),
+      username: process.env.DB_USER,
+      password: process.env.DB_PW,
+      database: process.env.DB_NAME,
+      ssl: process.env.STAGE === 'prod' ? true : false,
     };
   },
 };
